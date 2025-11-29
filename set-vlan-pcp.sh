@@ -230,8 +230,8 @@ echo "Setting ${F_BOLD}${C_BLUE}${IFACE}${NO_FORMAT} interface egress QoS priori
 	egress 0:"${PCP}" 1:"${PCP}" 2:"${PCP}" 3:"${PCP}" 4:"${PCP}" 5:"${PCP}" 6:"${PCP}" 7:"${PCP}"
 
 if [ ${OPT_CONFIRM} -eq 1 ]; then
-  INGRESS=$(/usr/bin/ip -d link show "${IFACE}" | /usr/bin/grep "ingress" | sed 's/ingress-qos-map //g')
-  EGRESS=$(/usr/bin/ip -d link show "${IFACE}" | /usr/bin/grep "egress" | sed 's/egress-qos-map //g')
+  INGRESS=$(/usr/bin/ip -d link show "${IFACE}" | /usr/bin/grep "ingress" | sed 's/[[:space:]]*ingress-qos-map //g')
+  EGRESS=$(/usr/bin/ip -d link show "${IFACE}" | /usr/bin/grep "egress" | sed 's/[[:space:]]*egress-qos-map //g')
 
   printf "\nQoS priority for ${F_BOLD}${C_BLUE}%s${NO_FORMAT}:\n" "${IFACE}"
   # echo "QoS priority for ${F_BOLD}${C_BLUE}${IFACE}${NO_FORMAT}:"

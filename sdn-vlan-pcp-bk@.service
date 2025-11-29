@@ -1,0 +1,13 @@
+[Unit]
+Description=Set VLAN priority on %i to Background (1)
+ConditionPathExists=/sys/class/net/%i
+After=network.target
+After=pve-sdn-commit.service
+PartOf=pve-sdn-commit.service
+
+[Service]
+Type=oneshot
+ExecStart=set-vlan-pcp.sh --interface %i --pcp BK -v
+
+[Install]
+WantedBy=pve-sdn-commit.service
