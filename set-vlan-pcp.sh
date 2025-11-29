@@ -225,7 +225,7 @@ if [ ${OPT_CONFIRM} -eq 1 ]; then
   INGRESS=$(/usr/bin/ip -d link show "${IFACE}" | /usr/bin/grep "ingress")
   EGRESS=$(/usr/bin/ip -d link show "${IFACE}" | /usr/bin/grep "egress")
 
-  printf "\nQoS priority for %s:" "${F_BOLD}${C_BLUE}${IFACE}${NO_FORMAT}"
+  printf "\nQoS priority for ${F_BOLD}${C_BLUE}%s${NO_FORMAT}:" "${IFACE}"
   # echo "QoS priority for ${F_BOLD}${C_BLUE}${IFACE}${NO_FORMAT}:"
   echo "${INGRESS}"
   echo "${EGRESS}"
