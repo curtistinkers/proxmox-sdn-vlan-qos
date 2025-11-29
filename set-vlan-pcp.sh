@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
 
+# Color and format codes
 NO_FORMAT="\033[0m"
 F_BOLD="\033[1m"
 #_UNDERLINED="\033[4m"
@@ -18,6 +19,35 @@ OPT_GET=0
 OPT_CONFIRM=0
 BAD_IFACE=0
 BAD_PCP=0
+
+# Print functions
+# print_info() {
+#   echo "${F_BOLD}${C_YELLOW}INFO:${NO_FORMAT} ${1}"
+# }
+
+print_error() {
+  echo "${F_BOLD}${C_RED}ERROR:${NO_FORMAT} ${1}"
+}
+
+print_verbose() {
+  if [ ! ${OPT_VERBOSE} -eq 0 ]; then
+    echo "${1}"
+  fi
+}
+
+# print_yellow() {
+#   echo "${F_BOLD}${C_YELLOW}${1}${NO_FORMAT}" 
+# }
+
+# print_green() {
+#   echo "${F_BOLD}${C_LIME}${1}${NO_FORMAT}" 
+# }
+
+print_acronym_notice() {
+  if [ ! ${OPT_VERBOSE} -eq 0 ]; then
+    echo "${F_BOLD}${C_YELLOW}NOTICE:${NO_FORMAT} ${F_BOLD}${C_BLUE}${1}${NO_FORMAT} has a PCP value of ${F_BOLD}${C_LIME}${2}${NO_FORMAT}."
+  fi
+}
 
 # Read command line options
 while [ ${#} -gt 0 ]; do
@@ -94,42 +124,10 @@ get_qos_map() {
   INGRESS=$(/usr/bin/ip -d link show "${1}" | /usr/bin/grep "ingress" | sed 's/[[:space:]]*ingress-qos-map //g')
   EGRESS=$(/usr/bin/ip -d link show "${1}" | /usr/bin/grep "egress" | sed 's/[[:space:]]*egress-qos-map //g')
 
-  printf "\nVLAN QoS priority for ${F_BOLD}${C_BLUE}%s${NO_FORMAT}:\n" "${1}"
+  printf "VLAN QoS priority for ${F_BOLD}${C_BLUE}%s${NO_FORMAT}:\n" "${1}"
   # echo "QoS priority for ${F_BOLD}${C_BLUE}${IFACE}${NO_FORMAT}:"
   printf "\t${F_BOLD}${C_YELLOW}Ingress QoS map${NO_FORMAT}: %s\n" "${INGRESS}"
   printf "\t${F_BOLD}${C_LIME}Egress QoS map${NO_FORMAT}: %s\n" "${EGRESS}"
-
-  if [ ${OPT_GET} -eq 1 ]; then
-    exit 0
-  fi
-}
-
-print_info() {
-  echo "${F_BOLD}${C_YELLOW}INFO:${NO_FORMAT} ${1}"
-}
-
-print_error() {
-  echo "${F_BOLD}${C_RED}ERROR:${NO_FORMAT} ${1}"
-}
-
-print_verbose() {
-  if [ ! ${OPT_VERBOSE} -eq 0 ]; then
-    echo "${1}"
-  fi
-}
-
-# print_yellow() {
-#   echo "${F_BOLD}${C_YELLOW}${1}${NO_FORMAT}" 
-# }
-
-# print_green() {
-#   echo "${F_BOLD}${C_LIME}${1}${NO_FORMAT}" 
-# }
-
-print_acronym_notice() {
-  if [ ! ${OPT_VERBOSE} -eq 0 ]; then
-    echo "${F_BOLD}${C_YELLOW}NOTICE:${NO_FORMAT} ${F_BOLD}${C_BLUE}${1}${NO_FORMAT} has a PCP value of ${F_BOLD}${C_LIME}${2}${NO_FORMAT}."
-  fi
 }
 
 pcp_to_string() {
@@ -241,7 +239,12 @@ if [ ${BAD_IFACE} -eq 1 ]; then check_exit; fi
 
 set_interface "${OPT_IFACE}"
 
-if [ ${OPT_GET} -eq 1 ]; then get_qos_map "${IFACE}"; fi
+if [ ${OPT_GET} -eq 1 ]; then
+  printf "\n"
+  get_qos_map "${IFACE}"
+  printf "\n"
+  exit 0
+fi
 
 set_pcp "${OPT_PCP}"
 
