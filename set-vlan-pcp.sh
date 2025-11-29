@@ -96,6 +96,14 @@ print_verbose() {
   fi
 }
 
+print_yellow() {
+  echo "${F_BOLD}${C_YELLOW}${1}${NO_FORMAT}" 
+}
+
+print_green() {
+  echo "${F_BOLD}${C_LIME}${1}${NO_FORMAT}" 
+}
+
 print_acronym_notice() {
   if [ ! ${OPT_VERBOSE} -eq 0 ]; then
     echo "${F_BOLD}${C_YELLOW}NOTICE:${NO_FORMAT} ${F_BOLD}${C_BLUE}${1}${NO_FORMAT} has a PCP value of ${F_BOLD}${C_LIME}${2}${NO_FORMAT}."
@@ -180,7 +188,7 @@ set_pcp() {
       ;;
     *)
       # ${1} is a number
-      if [ ${1} -ge 0 ] && [ ${1} -le 7 ]; then
+      if [ "${1}" -ge 0 ] && [ "${1}" -le 7 ]; then
         PCP=${1}
         print_verbose "${F_BOLD}${C_YELLOW}NOTICE:${NO_FORMAT} ${F_BOLD}${C_LIME}${1}${NO_FORMAT} is a valid PCP value."
       else
@@ -208,8 +216,8 @@ check_exit() {
 if [ ${OPT_HELP} -eq 1 ]; then get_help; fi
 
 
-set_interface ${OPT_IFACE}
-set_pcp ${OPT_PCP}
+set_interface "${OPT_IFACE}"
+set_pcp "${OPT_PCP}"
 
 check_exit
 
@@ -227,6 +235,6 @@ if [ ${OPT_CONFIRM} -eq 1 ]; then
 
   printf "\nQoS priority for ${F_BOLD}${C_BLUE}%s${NO_FORMAT}:\n" "${IFACE}"
   # echo "QoS priority for ${F_BOLD}${C_BLUE}${IFACE}${NO_FORMAT}:"
-  echo "${F_BOLD}${C_YELLOW}Ingress QoS${NO_FORMAT}: ${INGRESS}"
-  echo "${F_BOLD}${C_LIME}Egress QoS${NO_FORMAT}: ${EGRESS}"
+  print_yellow "${INGRESS}"
+  print_green "${EGRESS}"
 fi
