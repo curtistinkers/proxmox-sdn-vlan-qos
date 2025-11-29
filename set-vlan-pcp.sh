@@ -14,6 +14,7 @@ F_TAB="\t"
 # Default options
 OPT_HELP=0
 OPT_VERBOSE=0
+OPT_CONFIRM=0
 BAD_IFACE=0
 BAD_PCP=0
 
@@ -46,6 +47,10 @@ while [ ${#} -gt 0 ]; do
     -v | --verbose)
       # Enable verbose mode
       OPT_VERBOSE=1
+      ;;
+    -c | --confirm)
+      # Enable confirmation mode
+      OPT_CONFIRM=1
       ;;
   esac
   shift
@@ -215,3 +220,11 @@ echo "Setting ${F_BOLD}${C_BLUE}${IFACE}${NO_FORMAT} interface egress QoS priori
 /usr/bin/ip link set "${IFACE}" type vlan \
 	ingress 0:1 1:0 2:2 3:3 4:4 5:5 6:6 7:7 \
 	egress 0:"${PCP}" 1:"${PCP}" 2:"${PCP}" 3:"${PCP}" 4:"${PCP}" 5:"${PCP}" 6:"${PCP}" 7:"${PCP}"
+
+if [ ${OPT_CONFIRM} -eq 1 ]; then
+  INGRESS=$(/usr/bin/ip -d link show "${IFACE}" | /usr/bin/grep "ingress")
+  EGRESS=$(/usr/bin/ip -d link show "${IFACE}" | /usr/bin/grep "egress")
+  echo "Current egress QoS priority mapping for ${F_BOLD}${C_BLUE}${IFACE}${NO_FORMAT}:"
+  echo "${INGRESS}"
+  echo "${EGRESS}"
+fi
