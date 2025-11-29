@@ -14,6 +14,7 @@ F_TAB="\t"
 # Default options
 OPT_HELP=0
 OPT_VERBOSE=0
+OPT_GET=0
 OPT_CONFIRM=0
 BAD_IFACE=0
 BAD_PCP=0
@@ -48,8 +49,12 @@ while [ ${#} -gt 0 ]; do
       # Enable verbose mode
       OPT_VERBOSE=1
       ;;
+    -g | --get)
+      # Check QOS map
+      OPT_GET=1
+      ;;
     -c | --confirm)
-      # Enable confirmation mode
+      # Print QOS map after setting
       OPT_CONFIRM=1
       ;;
   esac
@@ -57,13 +62,16 @@ while [ ${#} -gt 0 ]; do
 done
 
 get_help() {
-  echo "\n${C_YELLOW}Easy VLAN priority shell script${NO_FORMAT}\n"
+  echo "\n${C_YELLOW}VLAN QoS priority shell script${NO_FORMAT}\n"
+  echo "This script sets the VLAN priority code point (PCP) for a specified VLAN interface."
 
   echo "Usage:"
   echo "\t${C_LIME}-h | --help${NO_FORMAT}\t\tThis menu"
   echo "\t${C_LIME}-v | --verbose${NO_FORMAT}\t\tVerbose output"
   echo "\t${C_LIME}-i | --interface${NO_FORMAT}\tVLAN interface name (ex vmbr0.19)"
   echo "\t${C_LIME}-p | --pcp${NO_FORMAT}\t\tVLAN priority code point, must be 0-7"
+  echo "\t${C_LIME}-c | --confirm${NO_FORMAT}\t\tShow current VLAN priority code point mappings after setting"
+  echo "\t${C_LIME}-g | --get${NO_FORMAT}\t\tGet current VLAN priority code point mappings for interface"
   echo "\nPriority code points:\n"
 
   echo "${F_TAB}PCP #${F_TAB}Priority${F_TAB}Acronym${F_TAB}Traffic types"
@@ -82,6 +90,20 @@ get_help() {
   exit 0
 }
 
+get_qos_map() {
+  INGRESS=$(/usr/bin/ip -d link show "${1}" | /usr/bin/grep "ingress" | sed 's/[[:space:]]*ingress-qos-map //g')
+  EGRESS=$(/usr/bin/ip -d link show "${1}" | /usr/bin/grep "egress" | sed 's/[[:space:]]*egress-qos-map //g')
+
+  printf "\nVLAN QoS priority for ${F_BOLD}${C_BLUE}%s${NO_FORMAT}:\n" "${1}"
+  # echo "QoS priority for ${F_BOLD}${C_BLUE}${IFACE}${NO_FORMAT}:"
+  printf "\t${F_BOLD}${C_YELLOW}Ingress QoS map${NO_FORMAT}: %s\n" "${INGRESS}"
+  printf "\t${F_BOLD}${C_LIME}Egress QoS map${NO_FORMAT}: %s\n" "${EGRESS}"
+
+  if [ ${OPT_GET} -eq 1 ]; then
+    exit 0
+  fi
+}
+
 print_info() {
   echo "${F_BOLD}${C_YELLOW}INFO:${NO_FORMAT} ${1}"
 }
@@ -96,13 +118,13 @@ print_verbose() {
   fi
 }
 
-print_yellow() {
-  echo "${F_BOLD}${C_YELLOW}${1}${NO_FORMAT}" 
-}
+# print_yellow() {
+#   echo "${F_BOLD}${C_YELLOW}${1}${NO_FORMAT}" 
+# }
 
-print_green() {
-  echo "${F_BOLD}${C_LIME}${1}${NO_FORMAT}" 
-}
+# print_green() {
+#   echo "${F_BOLD}${C_LIME}${1}${NO_FORMAT}" 
+# }
 
 print_acronym_notice() {
   if [ ! ${OPT_VERBOSE} -eq 0 ]; then
@@ -215,11 +237,15 @@ check_exit() {
 
 if [ ${OPT_HELP} -eq 1 ]; then get_help; fi
 
+if [ ${BAD_IFACE} -eq 1 ]; then check_exit; fi
 
 set_interface "${OPT_IFACE}"
+
+if [ ${OPT_GET} -eq 1 ]; then get_qos_map "${IFACE}"; fi
+
 set_pcp "${OPT_PCP}"
 
-check_exit
+if [ ${BAD_IFACE} -eq 1 ] || [ ${BAD_PCP} -eq 1 ]; then check_exit; fi
 
 PCP_STR=$(pcp_to_string "${PCP}")
 
@@ -230,11 +256,7 @@ echo "Setting ${F_BOLD}${C_BLUE}${IFACE}${NO_FORMAT} interface egress QoS priori
 	egress 0:"${PCP}" 1:"${PCP}" 2:"${PCP}" 3:"${PCP}" 4:"${PCP}" 5:"${PCP}" 6:"${PCP}" 7:"${PCP}"
 
 if [ ${OPT_CONFIRM} -eq 1 ]; then
-  INGRESS=$(/usr/bin/ip -d link show "${IFACE}" | /usr/bin/grep "ingress" | sed 's/[[:space:]]*ingress-qos-map //g')
-  EGRESS=$(/usr/bin/ip -d link show "${IFACE}" | /usr/bin/grep "egress" | sed 's/[[:space:]]*egress-qos-map //g')
-
-  printf "\nVLAN QoS priority for ${F_BOLD}${C_BLUE}%s${NO_FORMAT}:\n" "${IFACE}"
-  # echo "QoS priority for ${F_BOLD}${C_BLUE}${IFACE}${NO_FORMAT}:"
-  printf "\t${F_BOLD}${C_YELLOW}Ingress QoS map${NO_FORMAT}: %s\n" "${INGRESS}"
-  printf "\t${F_BOLD}${C_LIME}Egress QoS map${NO_FORMAT}: %s\n" "${EGRESS}"
+  get_qos_map "${IFACE}"
 fi
+
+exit 0
