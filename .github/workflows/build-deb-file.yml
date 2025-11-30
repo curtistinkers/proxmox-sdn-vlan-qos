@@ -1,14 +1,12 @@
 name: Build .deb file
 
-on: push
+on:
+  push:
+    tags:
+      - "v*" # Triggers on pushes to tags starting with "v"
 
-# on:
-#   push:
-#     tags:
-#       - "v*" # Triggers on pushes to tags starting with "v"
-
-# permissions:
-#   contents: write
+permissions:
+  contents: write
 
 jobs:
   build:

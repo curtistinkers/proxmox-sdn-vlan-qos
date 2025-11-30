@@ -1,11 +1,13 @@
 {
     "cSpell.words": [
+        "debhelper",
         "dpkg",
         "IFACE",
         "Internetwork",
         "libpve",
         "oneshot",
         "ORANGERED",
+        "softprops",
         "vmbr"
     ]
 }
