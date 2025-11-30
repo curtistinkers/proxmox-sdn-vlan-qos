@@ -12,6 +12,11 @@ jobs:
   build-deb:
     runs-on: ubuntu-latest
     steps:
+      - name: Get repository name
+        id: get_repo_name
+        run: |
+          echo "Repository name: ${{ github.event.repository.name }}"
+
       - name: Get tag name and remove 'v'
         id: get_version
         run: |
@@ -22,17 +27,23 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_ENV # Make VERSION available to subsequent steps
 
       - name: Checkout repository
+        id: checkout_repo
         uses: actions/checkout@v4
         with:
           path: "REPO"
      
-      - name: Copy files to keep extraneous files out of the package, then build the package
+      - name: Copy files to keep extraneous files out of the package
+        id: copy_files
         run: |
           mkdir PKG_SOURCE
           cp -Rf REPO/usr REPO/DEBIAN PKG_SOURCE
-          dpkg-deb --build PKG_SOURCE proxmox-sdn-vlan-qos_${{ env.VERSION }}_all.deb
+
+      - name: Build .deb package
+        id: build_deb_package
+        run: |
+          dpkg-deb --build PKG_SOURCE ${{ github.event.repository.name }}_${{ env.VERSION }}_all.deb
         
-      - name: Create Release and Upload Assets
+      - name: Create release and upload assets
         uses: softprops/action-gh-release@v2
         with:
-          files: proxmox-sdn-vlan-qos_${{ env.VERSION }}_all.deb
+          files: ${{ github.event.repository.name }}_${{ env.VERSION }}_all.deb
