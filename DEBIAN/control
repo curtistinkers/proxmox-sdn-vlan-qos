@@ -1,0 +1,13 @@
+Package: proxmox-sdn-vlan-qos
+Architecture: all
+Maintainer: curtistinkers <curtistinkers.commit@gmail.com>
+Version: 1.0
+Section: misc
+Priority: optional
+Depends: libpve-network-perl
+Description: Systemd templates to set VLAN QoS on Proxmox SDN networks.
+    This package provides systemd service templates and an additional helper
+    script to set VLAN ingress and egress Quality of Service (QoS) priority
+    code points on Proxmox Software Defined Networks (SDN) after updates. VLAN
+    QoS ensures network traffic is prioritized effectively for enhanced
+    performance and reliability.
