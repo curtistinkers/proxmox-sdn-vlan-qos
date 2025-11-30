@@ -1,4 +1,4 @@
-name: Build .deb file
+name: Build Debian package file on tag push
 
 on:
   push:
@@ -16,13 +16,8 @@ jobs:
   build-deb:
     runs-on: ubuntu-latest
     steps:
-      - name: Get repository name
-        id: get_repo_name
-        run: |
-          echo "Repository name: $REPO_NAME"
-
       - name: Get tag name and remove 'v'
-        id: get_version
+        id: fix_version
         run: |
           echo "Original Tag Name: ${VERSION}"
           NO_V_VERSION="${VERSION#v}" # Removes a leading 'v' if present
@@ -34,18 +29,22 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: "REPO"
-     
-      - name: Copy files to keep extraneous files out of the package
-        id: copy_files
+
+      - name: Create PKG_SOURCE directory
+        id: create_pkg_source_dir
         run: |
           mkdir PKG_SOURCE
+
+      - name: Copy files to keep extraneous files out of the package
+        id: copy_debian_pkg_files
+        run: |
           cp -Rf REPO/usr REPO/DEBIAN PKG_SOURCE
 
-      - name: Build .deb package
+      - name: Build .deb file
         id: build_deb_package
         run: |
           dpkg-deb --build PKG_SOURCE ${{ env.REPO_NAME }}_${{ env.VERSION }}_all.deb
-        
+
       - name: Create release and upload assets
         uses: softprops/action-gh-release@v2
         with:
