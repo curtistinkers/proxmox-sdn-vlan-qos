@@ -1,7 +1,7 @@
 Package: proxmox-sdn-vlan-qos
 Architecture: all
 Maintainer: curtistinkers <curtistinkers.commit@gmail.com>
-Homepage: https://github.com/curtistinkers/proxmox-vlan-pcp
+Homepage: https://github.com/curtistinkers/proxmox-sdn-vlan-qos
 Version: 1.0
 Section: misc
 Priority: optional
