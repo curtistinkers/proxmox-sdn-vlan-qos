@@ -102,3 +102,20 @@ Similarly, if you want to set VLAN `666` on `vmbr1` to *Voice*:
 ```sh
 systemctl enable --now sdn-vlan-qos-vo@vmbr0.666
 ```
+
+## Build and install as `.deb` package
+
+Strictly speaking, this is not necessary. You may copy the systemd templates
+into `/etc/systemd/system/` and the helper script into `/usr/local/bin` if you
+prefer not to have the files managed by `dpkg`.
+
+```sh
+# Clone the repo
+git clone https://github.com/curtistinkers/proxmox-sdn-vlan-qos
+
+# Package it into a .deb
+dpkg-deb -b proxmox-sdn-vlan-qos
+
+# Install the package
+dpkg -i proxmox-sdn-vlan-qos.deb
+```
